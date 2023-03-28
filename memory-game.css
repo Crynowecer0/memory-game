@@ -1,4 +1,21 @@
-/* you can add to or change this. */
+/* minimal reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1 {
+  text-align: center;
+}
+
+#game {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  width: 50%;
+}
+
 
 #game div {
   border: 1px solid black;
