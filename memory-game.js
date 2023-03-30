@@ -1,4 +1,5 @@
 "use strict";
+// localStorage.clear();
 /** global constants */
 const FOUND_MATCH_WAIT_MSECS = 1000;
 const COLORS = [
@@ -15,57 +16,41 @@ const COLORS = [
 ];
 
 /* code to handle the inital page load  */
-const startScreen = document.getElementById("start-screen");
+const homeScreen = document.getElementById("start-screen");
 const highScoreDisplay = document.getElementById("high-score");
 const startButton = document.getElementById("start-button");
 const highScoreData = localStorage.getItem("highScore");
+let gameBoard = null;
+let gameCards = null;
+let cardsLeft = null;
+let startTime = null;
 
 /* checks if the highscore is defined, and if it is updates DOM to display it */
-if (highScoreData) {
-  highScoreDisplay.innerHTML = `Current High Score: ${highScoreData}`;
-}
+highScoreDisplay.innerHTML = `Current High Score: ${highScoreData || "NA"}`;
 
 //add an event listern to start button, when start button is clicked, call the start game function
-startButton.addEventListener("click", playRound);
+startButton.addEventListener("click", startGame);
 
 //TODO: research docstrings and refactor - use as a learning exercise
 
-/** playRound will represent one round.  */
-function playRound() {
-  startScreen.remove();
+/** startGame will represent one round.  */
+function startGame() {
+  homeScreen.remove();
   //TODO:refactor so that the game ID is created by javascript to make clearing the screen easier
+  createTimerElement();
   createCards(colors);
   //create and start the timer that the player sees
-  createTimerElement();
-  const startTime = new Date()
 
-  const gameBoard = document.getElementById('game')
-  const gameCardArray = [...gameBoard.children]
+  startTime = Date.now();
 
-  const playing = !gameCardArray.every((card)=>{
-    return [...card.classList].includes('flipCard')
-  })
+  gameBoard = document.getElementById("game");
+  gameCards = [...gameBoard.children];
+  cardsLeft = gameCards.length;
+  console.log(cardsLeft);
 
-  console.log(playing)
-
-  // while (playing) {
-  //   console.log('im playing')
-  // }
-
-  // for (const card of gameCardArray) {
-  // }
-  //while
-
-  //how do I know when a round is over? what ways could I keep track of it
-  //the length of gameCardArray?
-  //the number of cards in game card array
-
-
-  //code to handle a round ending
-  //access the current round time
-  //check if that time is less than the current value at localstorage.get(highscore)
-  //if it is, change the local storage high score
-  // location.reload()
+  gameCards.forEach((card) => {
+    card.addEventListener("click", handleCardClick);
+  });
 }
 
 /** Memory game: find matching pairs of cards and flip both of them. */
@@ -112,7 +97,8 @@ function createCards(colors) {
     back.classList.add("back");
     card.classList.add(`${color}`);
 
-    card.addEventListener("click", handleCardClick);
+    //TODO:refactor this out of create cards into the main play game function
+
     card.appendChild(front);
     card.appendChild(back);
     gameBoard.appendChild(card);
@@ -132,16 +118,16 @@ function createTimerElement() {
   colon.innerHTML = ":";
   seconds.innerHTML = "00";
 
-  timerDiv.setAttribute('id', 'timerDiv')
+  timerDiv.setAttribute("id", "timerDiv");
   minutes.setAttribute("id", "minutes");
   colon.setAttribute("id", "colon");
   seconds.setAttribute("id", "seconds");
 
-  timerDiv.appendChild(minutes)
-  timerDiv.appendChild(colon)
-  timerDiv.appendChild(seconds)
+  timerDiv.appendChild(minutes);
+  timerDiv.appendChild(colon);
+  timerDiv.appendChild(seconds);
 
-  document.body.appendChild(timerDiv)
+  document.body.appendChild(timerDiv);
 
   var minutesLabel = document.getElementById("minutes");
   var secondsLabel = document.getElementById("seconds");
@@ -203,8 +189,14 @@ function resolveTurn() {
     const cardOneColor = currentClickedCards[0].classList[0];
     const cardTwoColor = currentClickedCards[1].classList[0];
     if (cardOneColor === cardTwoColor) {
-      // alert("you got a match!");
+      cardsLeft = cardsLeft - 2;
+      if (!cardsLeft) {
+        const endTime = Date.now();
+        gameOver(startTime, endTime);
+      }
       currentClickedCards = [];
+      //based on the current code structure this is where the gameOver check should live
+      //find a way to see if there are any cards left =>
       return;
     } else {
       for (let card of currentClickedCards) {
@@ -214,4 +206,15 @@ function resolveTurn() {
       return;
     }
   }
+}
+
+function gameOver(startTime, endTime) {
+  const gameDuration = Math.round((endTime - startTime) / 1000);
+  if (
+    !localStorage.getItem("highScore") ||
+    localStorage.getItem("highScore") > gameDuration
+  ) {
+    localStorage.setItem("highScore", gameDuration);
+  }
+  location.reload();
 }
