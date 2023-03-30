@@ -1,5 +1,4 @@
 "use strict";
-// localStorage.clear();
 /** global constants */
 const FOUND_MATCH_WAIT_MSECS = 1000;
 const COLORS = [
@@ -48,9 +47,12 @@ function startGame() {
   cardsLeft = gameCards.length;
   console.log(cardsLeft);
 
-  gameCards.forEach((card) => {
-    card.addEventListener("click", handleCardClick);
-  });
+  addHandlersToCards(gameCards);
+
+  //OLD VERSION TO DELETE
+  // gameCards.forEach((card) => {
+  //   card.addEventListener("click", handleCardClick);
+  // });
 }
 
 /** Memory game: find matching pairs of cards and flip both of them. */
@@ -150,6 +152,20 @@ function createTimerElement() {
   }
 }
 
+/** given an array of card elements, add an event listener card */
+function addHandlersToCards(array) {
+  array.forEach((item) => {
+    item.addEventListener("click", handleCardClick);
+  });
+}
+
+/** given an array of card elements, remove an event listener from each card */
+function removeHandlersFromCards(array) {
+  array.forEach((item) => {
+    item.removeEventListener("click", handleCardClick);
+  });
+}
+
 /** Flip a card face-up. */
 
 function flipCard(card) {
@@ -177,11 +193,14 @@ function handleCardClick(event) {
     alert("this card is already clicked");
     return;
   }
+
   flipCard(card);
-
-  setTimeout(resolveTurn, 1000);
-
   currentClickedCards.push(card);
+
+  if (currentClickedCards.length === 2) {
+    removeHandlersFromCards(gameCards);
+    setTimeout(resolveTurn, 1000);
+  }
 }
 
 function resolveTurn() {
@@ -195,14 +214,17 @@ function resolveTurn() {
         gameOver(startTime, endTime);
       }
       currentClickedCards = [];
-      //based on the current code structure this is where the gameOver check should live
-      //find a way to see if there are any cards left =>
+      addHandlersToCards(gameCards);
+      for (let card of currentClickedCards) {
+        unFlipCard(card);
+      }
       return;
     } else {
       for (let card of currentClickedCards) {
         unFlipCard(card);
       }
       currentClickedCards = [];
+      addHandlersToCards(gameCards);
       return;
     }
   }
@@ -215,6 +237,9 @@ function gameOver(startTime, endTime) {
     localStorage.getItem("highScore") > gameDuration
   ) {
     localStorage.setItem("highScore", gameDuration);
+    alert("You are a speed demon, you got the new best time!");
+    setTimeout(location.reload(), 500);
   }
-  location.reload();
+  alert("You win!!!");
+  setTimeout(location.reload(), 500);
 }
