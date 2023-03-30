@@ -27,8 +27,6 @@ let gameBoard = null;
 let gameCards = null;
 let cardsLeft = null;
 let playerScore = null;
-//TODO: delete upon successfully implementing the click based score
-let startTime = null;
 
 /* checks if the highscore is defined, and if it is updates DOM to display it */
 highScoreDisplay.innerHTML = `Current High Score: ${highScoreData || "NA"}`;
@@ -43,12 +41,8 @@ function startGame() {
   homeScreen.remove();
   playerScore = 0;
   createScoreDiv(playerScore);
-  createTimerElement();
-  //call the TBD score function
   createCards(colors);
   //create and start the timer that the player sees
-
-  startTime = Date.now();
 
   gameBoard = document.getElementById("game");
   gameCards = [...gameBoard.children];
@@ -56,11 +50,6 @@ function startGame() {
   console.log(cardsLeft);
 
   addHandlersToCards(gameCards);
-
-  //OLD VERSION TO DELETE
-  // gameCards.forEach((card) => {
-  //   card.addEventListener("click", handleCardClick);
-  // });
 }
 
 /** Memory game: find matching pairs of cards and flip both of them. */
@@ -126,7 +115,8 @@ function createScoreDiv(playerScore) {
 }
 
 /** Initially implemented a timer and used that as a score, but changed it to
- * counting clicks upon re-reading the instructions
+ * counting clicks upon re-reading the instructions. This function is not being
+ * no longer in use
  */
 
 // function createTimerElement() {
