@@ -2,16 +2,30 @@
 /** global constants */
 const FOUND_MATCH_WAIT_MSECS = 1000;
 const COLORS = [
-  "red",
-  "blue",
-  "green",
-  "orange",
-  "purple",
-  "red",
-  "blue",
-  "green",
-  "orange",
-  "purple",
+  "#9e0142",
+  "#d53e4f",
+  "#f46d43",
+  "#fdae61",
+  "#ffe08b",
+  "#e6f598",
+  "#abdda4",
+  "#66c2a5",
+  "#3288bd",
+  "#5e4fa2",
+  "#9e0142",
+  "#d53e4f",
+  "#f46d43",
+  "#fdae61",
+  "#ffe08b",
+  "#e6f598",
+  "#abdda4",
+  "#66c2a5",
+  "#3288bd",
+  "#5e4fa2",
+  "#320ebd",
+  "#66c220",
+  "#320ebd",
+  "#66c220",
 ];
 
 /* code to handle the inital page load  */
@@ -40,14 +54,13 @@ startButton.addEventListener("click", startGame);
 function startGame() {
   homeScreen.remove();
   playerScore = 0;
-  createScoreDiv(playerScore);
   createCards(colors);
-  //create and start the timer that the player sees
+  createScoreDiv(playerScore);
 
   gameBoard = document.getElementById("game");
   gameCards = [...gameBoard.children];
   cardsLeft = gameCards.length;
-  console.log(cardsLeft);
+  // console.log(cardsLeft);
 
   addHandlersToCards(gameCards);
 }
@@ -87,31 +100,32 @@ function createCards(colors) {
   const gameBoard = document.getElementById("game");
 
   for (let color of colors) {
-    const card = document.createElement("div");
-    const front = document.createElement("div");
-    const back = document.createElement("div");
-    front.style.backgroundColor = "grey";
-    back.style.backgroundColor = `${color}`;
-    front.classList.add("front");
-    back.classList.add("back");
-    card.classList.add(`${color}`);
+      const card = document.createElement("div");
+      const front = document.createElement("div");
+      const back = document.createElement("div");
+      front.style.backgroundColor = "grey";
+      back.style.backgroundColor = `${color}`;
+      front.classList.add("front");
+      back.classList.add("back");
+      card.classList.add(`${color}`, 'card');
 
-    //TODO:refactor this out of create cards into the main play game function
+      card.appendChild(front);
+      card.appendChild(back);
 
-    card.appendChild(front);
-    card.appendChild(back);
-    gameBoard.appendChild(card);
-    //append the card to the gameBoard div
+      gameBoard.appendChild(card);
+      //append the card to the gameBoard div
+
   }
 }
 /* creates the div that will display the running # of clicks and appends to DOM */
 function createScoreDiv(playerScore) {
+  const gameBoard = document.getElementById('game')
   const scoreCard = document.createElement("div");
   scoreCard.setAttribute("id", "scoreCard");
 
   scoreCard.innerHTML = playerScore;
 
-  document.body.append(scoreCard);
+  gameBoard.insertBefore(scoreCard, gameBoard.querySelector('#game :nth-child(13)'));
 }
 
 /** Initially implemented a timer and used that as a score, but changed it to
@@ -165,14 +179,20 @@ function createScoreDiv(playerScore) {
 /** given an array of card elements, add an event listener card */
 function addHandlersToCards(array) {
   array.forEach((item) => {
-    item.addEventListener("click", handleCardClick);
+    if ([...item.classList].includes('card')) {
+      item.addEventListener("click", handleCardClick);
+    }
+    // item.addEventListener("click", handleCardClick);
   });
 }
 
 /** given an array of card elements, remove an event listener from each card */
 function removeHandlersFromCards(array) {
   array.forEach((item) => {
-    item.removeEventListener("click", handleCardClick);
+    if ([...item.classList].includes('card')) {
+      item.removeEventListener("click", handleCardClick);
+    }
+    // item.removeEventListener("click", handleCardClick);
   });
 }
 
