@@ -19,9 +19,15 @@ const homeScreen = document.getElementById("start-screen");
 const highScoreDisplay = document.getElementById("high-score");
 const startButton = document.getElementById("start-button");
 const highScoreData = localStorage.getItem("highScore");
+
+/** variables needed within the global scope for the game to function as written
+ * all of these get defined when startGame is called later on
+ */
 let gameBoard = null;
 let gameCards = null;
 let cardsLeft = null;
+let playerScore = null;
+//TODO: delete upon successfully implementing the click based score
 let startTime = null;
 
 /* checks if the highscore is defined, and if it is updates DOM to display it */
@@ -35,8 +41,10 @@ startButton.addEventListener("click", startGame);
 /** startGame will represent one round.  */
 function startGame() {
   homeScreen.remove();
-  //TODO:refactor so that the game ID is created by javascript to make clearing the screen easier
+  playerScore = 0;
+  createScoreDiv(playerScore);
   createTimerElement();
+  //call the TBD score function
   createCards(colors);
   //create and start the timer that the player sees
 
@@ -107,50 +115,62 @@ function createCards(colors) {
     //append the card to the gameBoard div
   }
 }
+/* creates the div that will display the running # of clicks and appends to DOM */
+function createScoreDiv(playerScore) {
+  const scoreCard = document.createElement("div");
+  scoreCard.setAttribute("id", "scoreCard");
 
-/** Create a timer counting up from 0 */
-function createTimerElement() {
-  // const gameBoard = document.getElementById("game")
-  const timerDiv = document.createElement("div");
-  const minutes = document.createElement("label");
-  const colon = document.createElement("label");
-  const seconds = document.createElement("label");
+  scoreCard.innerHTML = playerScore;
 
-  minutes.innerHTML = "00";
-  colon.innerHTML = ":";
-  seconds.innerHTML = "00";
-
-  timerDiv.setAttribute("id", "timerDiv");
-  minutes.setAttribute("id", "minutes");
-  colon.setAttribute("id", "colon");
-  seconds.setAttribute("id", "seconds");
-
-  timerDiv.appendChild(minutes);
-  timerDiv.appendChild(colon);
-  timerDiv.appendChild(seconds);
-
-  document.body.appendChild(timerDiv);
-
-  var minutesLabel = document.getElementById("minutes");
-  var secondsLabel = document.getElementById("seconds");
-  var totalSeconds = 0;
-  setInterval(setTime, 1000);
-
-  function setTime() {
-    ++totalSeconds;
-    seconds.innerHTML = pad(totalSeconds % 60);
-    minutes.innerHTML = pad(parseInt(totalSeconds / 60));
-  }
-
-  function pad(val) {
-    var valString = val + "";
-    if (valString.length < 2) {
-      return "0" + valString;
-    } else {
-      return valString;
-    }
-  }
+  document.body.append(scoreCard);
 }
+
+/** Initially implemented a timer and used that as a score, but changed it to
+ * counting clicks upon re-reading the instructions
+ */
+
+// function createTimerElement() {
+//   // const gameBoard = document.getElementById("game")
+//   const timerDiv = document.createElement("div");
+//   const minutes = document.createElement("label");
+//   const colon = document.createElement("label");
+//   const seconds = document.createElement("label");
+
+//   minutes.innerHTML = "00";
+//   colon.innerHTML = ":";
+//   seconds.innerHTML = "00";
+
+//   timerDiv.setAttribute("id", "timerDiv");
+//   minutes.setAttribute("id", "minutes");
+//   colon.setAttribute("id", "colon");
+//   seconds.setAttribute("id", "seconds");
+
+//   timerDiv.appendChild(minutes);
+//   timerDiv.appendChild(colon);
+//   timerDiv.appendChild(seconds);
+
+//   document.body.appendChild(timerDiv);
+
+//   var minutesLabel = document.getElementById("minutes");
+//   var secondsLabel = document.getElementById("seconds");
+//   var totalSeconds = 0;
+//   setInterval(setTime, 1000);
+
+//   function setTime() {
+//     ++totalSeconds;
+//     seconds.innerHTML = pad(totalSeconds % 60);
+//     minutes.innerHTML = pad(parseInt(totalSeconds / 60));
+//   }
+
+//   function pad(val) {
+//     var valString = val + "";
+//     if (valString.length < 2) {
+//       return "0" + valString;
+//     } else {
+//       return valString;
+//     }
+//   }
+// }
 
 /** given an array of card elements, add an event listener card */
 function addHandlersToCards(array) {
@@ -169,6 +189,8 @@ function removeHandlersFromCards(array) {
 /** Flip a card face-up. */
 
 function flipCard(card) {
+  playerScore++;
+  updateScore(playerScore);
   card.classList.add("flipCard");
 }
 
@@ -176,6 +198,11 @@ function flipCard(card) {
 
 function unFlipCard(card) {
   card.classList.remove("flipCard");
+}
+
+/** updates the score tracker whenever a card is flipped */
+function updateScore(playerScore) {
+  document.getElementById("scoreCard").innerHTML = playerScore;
 }
 /**
  * data structure to keep track of cards that have been clicked in a turn, and
@@ -210,8 +237,7 @@ function resolveTurn() {
     if (cardOneColor === cardTwoColor) {
       cardsLeft = cardsLeft - 2;
       if (!cardsLeft) {
-        const endTime = Date.now();
-        gameOver(startTime, endTime);
+        gameOver(playerScore);
       }
       currentClickedCards = [];
       addHandlersToCards(gameCards);
@@ -230,14 +256,13 @@ function resolveTurn() {
   }
 }
 
-function gameOver(startTime, endTime) {
-  const gameDuration = Math.round((endTime - startTime) / 1000);
+function gameOver(num) {
   if (
     !localStorage.getItem("highScore") ||
-    localStorage.getItem("highScore") > gameDuration
+    localStorage.getItem("highScore") > num
   ) {
-    localStorage.setItem("highScore", gameDuration);
-    alert("You are a speed demon, you got the new best time!");
+    localStorage.setItem("highScore", num);
+    alert("You set the new lowest score!");
     setTimeout(location.reload(), 500);
   }
   alert("You win!!!");
