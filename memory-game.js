@@ -258,32 +258,43 @@ function handleCardClick(event) {
   }
 }
 
-/**Ha */
+/**handles the end case of a turn (when two cards have been selected)
+ * - no args, does not return anything
+ */
 function resolveTurn() {
   const cardOneColor = currentClickedCards[0].classList[0];
   const cardTwoColor = currentClickedCards[1].classList[0];
+  //if cards are matching, check if the game is over
   if (cardOneColor === cardTwoColor) {
     cardsLeft = cardsLeft - 2;
     if (!cardsLeft) {
       gameOver(playerScore);
     }
+    //if game is not over, clear the clicked cards + unflip them
     currentClickedCards = [];
     addHandlersToCards(gameCards);
     for (let card of currentClickedCards) {
       unFlipCard(card);
     }
-    return;
+    return null;
   }
 
+  //case: game not over, cards dont match - unflip everything + add eventListners
   for (let card of currentClickedCards) {
     unFlipCard(card);
   }
 
   currentClickedCards = [];
   addHandlersToCards(gameCards);
-  return;
+  return null;
 }
 
+/**
+ * called when cardsLeft is equal to 0
+ * - tags a number as an argument, does not return anything
+ * - updates the highscore if applicable
+ * - reloads the page, bringing the player back to the home screen
+ * */
 function gameOver(num) {
   if (
     !localStorage.getItem("highScore") ||
