@@ -53,7 +53,12 @@ startButton.addEventListener("click", startGame);
 
 //TODO: research docstrings and refactor - use as a learning exercise
 
-/** does not take any arugments and does not return anything  */
+/** does not take any arugments and does not return anything modifies the DOM
+ * to display an active gameboard when the player clicks on startButton
+ *
+ * - gameBoard will be a div containing 24 .card divs and one score div
+ * - a click event listener for each card to handleCardClick will be applied
+ */
 function startGame() {
   homeScreen.remove();
   playerScore = 0;
@@ -66,7 +71,7 @@ function startGame() {
   // console.log(cardsLeft);
 
   addHandlersToCards(gameCards);
-  return
+  return;
 }
 
 /** Memory game: find matching pairs of cards and flip both of them. */
@@ -97,7 +102,7 @@ function shuffle(items) {
  *
  * Each div DOM element will have:
  * - a class with the value of the color
- * - a click event listener for each card to handleCardClick
+ *
  */
 
 function createCards(colors) {
@@ -107,6 +112,7 @@ function createCards(colors) {
     const card = document.createElement("div");
     const front = document.createElement("div");
     const back = document.createElement("div");
+
     front.style.backgroundColor = "grey";
     back.style.backgroundColor = `${color}`;
     front.classList.add("front");
@@ -117,10 +123,9 @@ function createCards(colors) {
     card.appendChild(back);
 
     gameBoard.appendChild(card);
-    //append the card to the gameBoard div
   }
 }
-/* creates the div that will display the running # of clicks and appends to DOM */
+/** creates the div that will display the running # of clicks and appends to DOM*/
 function createScoreDiv(playerScore) {
   const gameBoard = document.getElementById("game");
   const scoreCard = document.createElement("div");
@@ -137,7 +142,7 @@ function createScoreDiv(playerScore) {
 /** Initially implemented a timer and used that as a score, but changed it to
  * counting clicks upon re-reading the instructions. This function is not being
  * no longer in use
- */
+
 
 // function createTimerElement() {
 //   // const gameBoard = document.getElementById("game")
@@ -181,8 +186,11 @@ function createScoreDiv(playerScore) {
 //     }
 //   }
 // }
+ */
 
-/** given an array of card elements, add an event listener card */
+/** given an array of card elements, add an event listener to each card to
+ * handleCardClick
+ */
 function addHandlersToCards(array) {
   array.forEach((item) => {
     if ([...item.classList].includes("card")) {
@@ -192,7 +200,9 @@ function addHandlersToCards(array) {
   });
 }
 
-/** given an array of card elements, remove an event listener from each card */
+/** given an array of card elements, remove the existing event listener to
+ * temporarily prevent user from clicking on any cards
+ */
 function removeHandlersFromCards(array) {
   array.forEach((item) => {
     if ([...item.classList].includes("card")) {
@@ -202,7 +212,9 @@ function removeHandlersFromCards(array) {
   });
 }
 
-/** Flip a card face-up. */
+/** Flip a card face-up, increment the current score, and call the updateScore
+ * function
+ */
 
 function flipCard(card) {
   playerScore++;
@@ -246,30 +258,30 @@ function handleCardClick(event) {
   }
 }
 
+/**Ha */
 function resolveTurn() {
-  if (currentClickedCards.length === 2) {
-    const cardOneColor = currentClickedCards[0].classList[0];
-    const cardTwoColor = currentClickedCards[1].classList[0];
-    if (cardOneColor === cardTwoColor) {
-      cardsLeft = cardsLeft - 2;
-      if (!cardsLeft) {
-        gameOver(playerScore);
-      }
-      currentClickedCards = [];
-      addHandlersToCards(gameCards);
-      for (let card of currentClickedCards) {
-        unFlipCard(card);
-      }
-      return;
-    } else {
-      for (let card of currentClickedCards) {
-        unFlipCard(card);
-      }
-      currentClickedCards = [];
-      addHandlersToCards(gameCards);
-      return;
+  const cardOneColor = currentClickedCards[0].classList[0];
+  const cardTwoColor = currentClickedCards[1].classList[0];
+  if (cardOneColor === cardTwoColor) {
+    cardsLeft = cardsLeft - 2;
+    if (!cardsLeft) {
+      gameOver(playerScore);
     }
+    currentClickedCards = [];
+    addHandlersToCards(gameCards);
+    for (let card of currentClickedCards) {
+      unFlipCard(card);
+    }
+    return;
   }
+
+  for (let card of currentClickedCards) {
+    unFlipCard(card);
+  }
+
+  currentClickedCards = [];
+  addHandlersToCards(gameCards);
+  return;
 }
 
 function gameOver(num) {
