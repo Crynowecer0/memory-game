@@ -28,29 +28,32 @@ const COLORS = [
   "#66c220",
 ];
 
-/* code to handle the inital page load  */
-const homeScreen = document.getElementById("start-screen");
-const highScoreDisplay = document.getElementById("high-score");
-const startButton = document.getElementById("start-button");
-const highScoreData = localStorage.getItem("highScore");
-
-/** variables needed within the global scope for the game to function as written
- * all of these get defined when startGame is called later on
+/** declaration of global variables needed for game logic. Global due to scoping
+ * requirements. all are defined when startGame is called below.
+ * gameBoard - div with class ID, holding individual card divs
+ * gameCards - an array of individual card divs
+ * cardsLeft -
  */
 let gameBoard = null;
 let gameCards = null;
 let cardsLeft = null;
 let playerScore = null;
 
-/* checks if the highscore is defined, and if it is updates DOM to display it */
+/** DOM elements present on page initial load/reload */
+const homeScreen = document.getElementById("start-screen");
+const highScoreDisplay = document.getElementById("high-score");
+const startButton = document.getElementById("start-button");
+const highScoreData = localStorage.getItem("highScore");
+
+/**sets the High score display based on content of local storage */
 highScoreDisplay.innerHTML = `Current High Score: ${highScoreData || "NA"}`;
 
-//add an event listern to start button, when start button is clicked, call the start game function
+/** event listeners present on page load/reload */
 startButton.addEventListener("click", startGame);
 
 //TODO: research docstrings and refactor - use as a learning exercise
 
-/** startGame will represent one round.  */
+/** does not take any arugments and does not return anything  */
 function startGame() {
   homeScreen.remove();
   playerScore = 0;
@@ -59,10 +62,11 @@ function startGame() {
 
   gameBoard = document.getElementById("game");
   gameCards = [...gameBoard.children];
-  cardsLeft = gameCards.length;
+  cardsLeft = gameCards.length - 1;
   // console.log(cardsLeft);
 
   addHandlersToCards(gameCards);
+  return
 }
 
 /** Memory game: find matching pairs of cards and flip both of them. */
@@ -100,32 +104,34 @@ function createCards(colors) {
   const gameBoard = document.getElementById("game");
 
   for (let color of colors) {
-      const card = document.createElement("div");
-      const front = document.createElement("div");
-      const back = document.createElement("div");
-      front.style.backgroundColor = "grey";
-      back.style.backgroundColor = `${color}`;
-      front.classList.add("front");
-      back.classList.add("back");
-      card.classList.add(`${color}`, 'card');
+    const card = document.createElement("div");
+    const front = document.createElement("div");
+    const back = document.createElement("div");
+    front.style.backgroundColor = "grey";
+    back.style.backgroundColor = `${color}`;
+    front.classList.add("front");
+    back.classList.add("back");
+    card.classList.add(`${color}`, "card");
 
-      card.appendChild(front);
-      card.appendChild(back);
+    card.appendChild(front);
+    card.appendChild(back);
 
-      gameBoard.appendChild(card);
-      //append the card to the gameBoard div
-
+    gameBoard.appendChild(card);
+    //append the card to the gameBoard div
   }
 }
 /* creates the div that will display the running # of clicks and appends to DOM */
 function createScoreDiv(playerScore) {
-  const gameBoard = document.getElementById('game')
+  const gameBoard = document.getElementById("game");
   const scoreCard = document.createElement("div");
   scoreCard.setAttribute("id", "scoreCard");
 
   scoreCard.innerHTML = playerScore;
 
-  gameBoard.insertBefore(scoreCard, gameBoard.querySelector('#game :nth-child(13)'));
+  gameBoard.insertBefore(
+    scoreCard,
+    gameBoard.querySelector("#game :nth-child(13)")
+  );
 }
 
 /** Initially implemented a timer and used that as a score, but changed it to
@@ -179,7 +185,7 @@ function createScoreDiv(playerScore) {
 /** given an array of card elements, add an event listener card */
 function addHandlersToCards(array) {
   array.forEach((item) => {
-    if ([...item.classList].includes('card')) {
+    if ([...item.classList].includes("card")) {
       item.addEventListener("click", handleCardClick);
     }
     // item.addEventListener("click", handleCardClick);
@@ -189,7 +195,7 @@ function addHandlersToCards(array) {
 /** given an array of card elements, remove an event listener from each card */
 function removeHandlersFromCards(array) {
   array.forEach((item) => {
-    if ([...item.classList].includes('card')) {
+    if ([...item.classList].includes("card")) {
       item.removeEventListener("click", handleCardClick);
     }
     // item.removeEventListener("click", handleCardClick);
