@@ -242,7 +242,7 @@ function handleCardClick(event) {
 
   if (currentClickedCards.length === 2) {
     removeHandlersFromCards(gameCards);
-    setTimeout(resolveTurn, 1000);
+    setTimeout(resolveTurn, FOUND_MATCH_WAIT_MSECS);
   }
 }
 
